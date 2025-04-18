@@ -75,8 +75,8 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public String currentUser(@AuthenticationPrincipal  UserDetails userDetails) {
-        return "Current user: " + userDetails.getUsername();
+    public ResponseEntity<?> currentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(userDetails);
     }
 
     @PostMapping("/login")

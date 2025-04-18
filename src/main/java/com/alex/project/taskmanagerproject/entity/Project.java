@@ -1,6 +1,7 @@
 package com.alex.project.taskmanagerproject.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
