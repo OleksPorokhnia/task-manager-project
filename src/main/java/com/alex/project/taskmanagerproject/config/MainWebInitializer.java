@@ -10,7 +10,7 @@ public class MainWebInitializer extends AbstractAnnotationConfigDispatcherServle
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{MainConfig.class};
+        return new Class[]{MainConfig.class, WebSocketConfiguration.class, JwtConfig.class};
     }
 
     @Override

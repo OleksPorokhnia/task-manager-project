@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Integer> {
     public Project findByTitle(String title);
+    public Optional<Project> findById(int id);
     public Optional<Project> getById(int id);
 }

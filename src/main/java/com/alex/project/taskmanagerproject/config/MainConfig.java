@@ -1,17 +1,20 @@
 package com.alex.project.taskmanagerproject.config;
 
+import com.alex.project.taskmanagerproject.jwt.JwtFilter;
 import com.alex.project.taskmanagerproject.repository.CsrfCustomizers;
 import com.alex.project.taskmanagerproject.repository.SpaCsrfTokenRequestHandler;
+import com.alex.project.taskmanagerproject.service.CustomUserDetailsService;
+import com.alex.project.taskmanagerproject.service.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.*;
+import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
@@ -31,6 +34,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
@@ -56,6 +60,17 @@ import java.util.Properties;
 @EnableJpaRepositories("com.alex.project.taskmanagerproject.repository")
 public class MainConfig {
 
+    @Autowired
+    @Lazy
+    private CustomUserDetailsService userDetailsService;
+    @Autowired
+    private JwtService jwtService;
+
+    @Bean
+    public JwtFilter jwtFilter(JwtService jwtService, CustomUserDetailsService customUserDetailsService) {
+        return new JwtFilter(jwtService, customUserDetailsService);
+    }
+
     @Bean
     public DataSource dataSource() {
         HikariConfig config = new HikariConfig();
@@ -71,17 +86,22 @@ public class MainConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(CsrfCustomizers.spaDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/csrf").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/portfolio/**").authenticated()
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/me").permitAll()
                         .requestMatchers("/api/project/add").authenticated()
+                        .requestMatchers("/portfolio").permitAll()
+                        .requestMatchers("/portfolio/info").permitAll()
+                        .requestMatchers("/topic/greetings").permitAll()
+                        .requestMatchers("/app/greet").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling((exception) -> exception
                         .authenticationEntryPoint(((request, response, authException) -> {
                             response.setStatus(401);
@@ -89,26 +109,19 @@ public class MainConfig {
                             response.getWriter().write("You must be logged in");
                 })))
                 .securityContext((securityContext) -> securityContext.
-                        securityContextRepository(new DelegatingSecurityContextRepository(
-                                new RequestAttributeSecurityContextRepository(),
-                                new HttpSessionSecurityContextRepository()))
-                        )
+                        securityContextRepository(new RequestAttributeSecurityContextRepository()))
+                .addFilterBefore(new JwtFilter(jwtService, userDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
         return http.build();
-//        http
-//                .cors(Customizer.withDefaults())
-//                .authorizeHttpRequests((authorize) -> authorize
-//                        .requestMatchers("/api/auth/login").permitAll()
-//                        .requestMatchers("/api/auth/csrf").permitAll()
-//                        .anyRequest().authenticated()
-//                ).securityContext((securityContext) -> securityContext
-//                        .securityContextRepository(new DelegatingSecurityContextRepository(
-//                                new RequestAttributeSecurityContextRepository(),
-//                                new HttpSessionSecurityContextRepository()
-//                        ))).csrf(CsrfCustomizers.spaDefaults());
-//        return http.build();
-}
+    }
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -125,7 +138,6 @@ public class MainConfig {
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setGenerateDdl(true);
 

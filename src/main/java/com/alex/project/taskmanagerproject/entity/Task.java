@@ -16,25 +16,23 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
-    @Size(max = 100)
+    @Column
     private String title;
 
-    @Column(nullable = false)
-    @Size(max = 3000)
+    @Column
     private String description;
 
     @Column
     private int priority;
 
     @Column
-    private String status = "TODO";
+    private String status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false)
+    @Column
     @Future
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate deadline;
@@ -53,10 +51,6 @@ public class Task {
     private LocalDateTime updatedAt;
 
     public Task() {
-    }
-
-    public Task(String status) {
-        this.status = "TODO";
     }
 
     public Project getProject() {

@@ -2,7 +2,9 @@ package com.alex.project.taskmanagerproject.service;
 
 import com.alex.project.taskmanagerproject.dto.UserRegistrationRequest;
 import com.alex.project.taskmanagerproject.entity.User;
+import com.alex.project.taskmanagerproject.entity.UserSearchEntity;
 import com.alex.project.taskmanagerproject.repository.UserRepository;
+import com.alex.project.taskmanagerproject.repository.UserSearchRepository;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,9 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserSearchRepository userSearchRepository;
+
     public void registerUser(UserRegistrationRequest userRegistrationRequest) {
         if(userRepository.existsByEmail(userRegistrationRequest.getEmail())) {
             throw new RuntimeException("Email already exists");
@@ -32,5 +37,9 @@ public class UserService {
         user.setNickname(userRegistrationRequest.getNickname());
 
         userRepository.save(user);
+        UserSearchEntity entity = new UserSearchEntity();
+        entity.setId(user.getId());
+        entity.setUsername(userRegistrationRequest.getNickname());
+        userSearchRepository.save(entity);
     }
 }

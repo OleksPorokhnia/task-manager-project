@@ -44,7 +44,11 @@ public class TaskService {
         task.setTitle(taskDto.getTitle());
         task.setDescription(taskDto.getDescription());
         task.setPriority(taskDto.getPriority());
-        task.setStatus("TODO");
+        if(taskDto.getStatus() != null || !taskDto.getStatus().isEmpty()){
+            task.setStatus(taskDto.getStatus());
+        }else{
+            task.setStatus("TODO");
+        }
         task.setUser(user);
         task.setDeadline(taskDto.getDeadline());
         task.setProject(project);
@@ -78,12 +82,18 @@ public class TaskService {
         task.setTitle(taskDto.getTitle());
         task.setDescription(taskDto.getDescription());
         task.setPriority(taskDto.getPriority());
-        task.setStatus("TODO");
+        task.setStatus(taskDto.getStatus()  );
         task.setUser(user);
         task.setDeadline(taskDto.getDeadline());
         task.setProject(project);
         task.setCreator(creator);
 
         return taskRepository.save(task);
+    }
+
+    public List<Task> getAllTasks(int projectId){
+        Project project = projectRepository.getById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        return taskRepository.getAllByProject(project);
     }
 }

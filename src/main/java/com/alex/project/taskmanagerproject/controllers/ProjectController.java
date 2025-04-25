@@ -1,6 +1,8 @@
 package com.alex.project.taskmanagerproject.controllers;
 
 import com.alex.project.taskmanagerproject.dto.ProjectDto;
+import com.alex.project.taskmanagerproject.dto.response.ProjectResponseDto;
+import com.alex.project.taskmanagerproject.dto.response.UserResponseDto;
 import com.alex.project.taskmanagerproject.entity.Project;
 import com.alex.project.taskmanagerproject.mappers.ProjectMapper;
 import com.alex.project.taskmanagerproject.repository.ProjectRepository;
@@ -9,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/project")
@@ -36,12 +40,14 @@ public class ProjectController {
         if(project.isEmpty()){
             return ResponseEntity.status(404).body("Project not found");
         }
-        return ResponseEntity.status(200).body(project);
+        return ResponseEntity.status(200).body(ProjectMapper.convertProjectToDto(project.get()));
     }
 
     @GetMapping("/")
     public ResponseEntity<?> getAllProjects() {
         List<Project> projects = projectRepository.findAll();
-        return ResponseEntity.status(200).body(projects);
+        List<ProjectResponseDto> projectResponseDtos = projects.stream().map(ProjectMapper::convertProjectToDto).toList();
+        return ResponseEntity.status(200).body(projectResponseDtos);
     }
+
 }

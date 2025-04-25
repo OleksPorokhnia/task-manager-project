@@ -4,41 +4,47 @@ import jakarta.validation.constraints.*;
 
 public class UserRegistrationRequest {
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Nickname cannot be blank")
+    @NotBlank(message = "Nickname cannot be blank")
     private String nickname;
 
-    @NotNull
-    @Email
-    @NotBlank
+    @NotNull(message = "Email cannot be blank")
+    @Email(message = "Incorrect email format")
+    @NotBlank(message = "Email cannot be blank")
     private String email;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Password cannot be blank")
+    @NotBlank(message = "Password cannot be blank")
     @Size(min = 8)
     private String password;
 
-    public @NotNull @NotBlank String getNickname() {
+    public UserRegistrationRequest(String nickname, String email, String password) {
+        this.nickname = nickname;
+        this.email = email;
+        this.password = password;
+    }
+
+    public @NotNull(message = "Nickname cannot be blank") @NotBlank(message = "Nickname cannot be blank") String getNickname() {
         return nickname;
     }
 
-    public void setNickname(@NotNull @NotBlank String nickname) {
+    public void setNickname(@NotNull(message = "Nickname cannot be blank") @NotBlank(message = "Nickname cannot be blank") String nickname) {
         this.nickname = nickname;
     }
 
-    public @NotNull @Email @NotBlank String getEmail() {
+    public @NotNull(message = "Email cannot be blank") @Email(message = "Incorrect email format") @NotBlank(message = "Email cannot be blank") String getEmail() {
         return email;
     }
 
-    public void setEmail(@NotNull @Email @NotBlank String email) {
+    public void setEmail(@NotNull(message = "Email cannot be blank") @Email(message = "Incorrect email format") @NotBlank(message = "Email cannot be blank") String email) {
         this.email = email;
     }
 
-    public @NotNull @NotBlank @Size(min = 8) String getPassword() {
+    public @NotNull(message = "Password cannot be blank") @NotBlank(message = "Password cannot be blank") @Size(min = 8) String getPassword() {
         return password;
     }
 
-    public void setPassword(@NotNull @NotBlank @Size(min = 8) String password) {
+    public void setPassword(@NotNull(message = "Password cannot be blank") @NotBlank(message = "Password cannot be blank") @Size(min = 8) String password) {
         this.password = password;
     }
 }

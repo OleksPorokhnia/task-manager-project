@@ -6,28 +6,36 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class UserLoginRequest {
-    @NotNull
-    @Email
-    @NotBlank
+    @NotNull(message = "Email cannot be blank")
+    @Email(message = "Incorrect email format")
+    @NotBlank(message = "Email cannot be blank")
     private String email;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Password cannot be blank")
+    @NotBlank(message = "Password cannot be blank")
     private String password;
 
-    public @NotNull @Email @NotBlank String getEmail() {
+    public UserLoginRequest() {
+    }
+
+    public UserLoginRequest(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public @NotNull(message = "Email cannot be blank") @Email(message = "Incorrect email format") @NotBlank(message = "Email cannot be blank") String getEmail() {
         return email;
     }
 
-    public void setEmail(@NotNull @Email @NotBlank String email) {
+    public void setEmail(@NotNull(message = "Email cannot be blank") @Email(message = "Incorrect email format") @NotBlank(message = "Email cannot be blank") String email) {
         this.email = email;
     }
 
-    public @NotNull @NotBlank String getPassword() {
+    public @NotNull(message = "Password cannot be blank") @NotBlank(message = "Password cannot be blank") String getPassword() {
         return password;
     }
 
-    public void setPassword(@NotNull @NotBlank String password) {
+    public void setPassword(@NotNull(message = "Password cannot be blank") @NotBlank(message = "Password cannot be blank") String password) {
         this.password = password;
     }
 }
