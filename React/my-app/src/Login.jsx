@@ -4,10 +4,13 @@ import axios, { all } from "axios";
 import Cookies from 'js-cookie'
 import { use } from 'react';
 import apiClient from './api';
+import { useNavigate } from 'react-router';
 
 
 function Login() {
   const [user, setUser] = useState({});
+
+  const navigate = useNavigate();
   async function fetchCsrfToken(){
     try{
       const resp = await axios.get("/auth/csrf", 
@@ -40,11 +43,14 @@ function Login() {
       // )
 
       try{
-        await apiClient.get("auth/csrf");
+        // await apiClient.get("auth/csrf");
         const response = await apiClient.post('auth/login', user);
-        const currentUser = await apiClient.get("auth/me");
-        console.log("Login successful! Response data:", response.data);
-        console.log("current user" + currentUser.data)
+        // const me = await apiClient.get("auth/me");
+        // console.log("current user " + me.data.username);
+        //   localStorage.setItem("username", me.data.username);
+        console.log("Login successful! Response data:", response);
+        localStorage.setItem("token", response.data.token);
+        navigate("/");
       } catch (error) {
         console.error("Error during login:", error.response.data);
       }
@@ -52,12 +58,8 @@ function Login() {
   };
 
   async function handleLogout(){
-    try{
-      const response = await apiClient.post("auth/logout");
-      console.log("Logout successful! Response data:", response.data);
-    } catch (error) {
-      console.error("You are not logged in!");
-    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
   }
 
 

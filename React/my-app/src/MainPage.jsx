@@ -7,9 +7,14 @@ function MainPage(){
     const [projects, setProjects] = useState([]);
 
     useEffect(() => {
-        apiClient.get("/project/").
-        then(resp => {
+        apiClient.get("/project/", {
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
+        })
+        .then(resp => {
             setProjects(resp.data);
+            console.log(resp.data);
         })
     }, [])
     async function handleAddProject(){
@@ -34,6 +39,8 @@ function MainPage(){
     return (
         <Fragment>
             <div>
+                <Link to={`auth/login`}>Login page</Link>
+                <Link to={`auth/registration`}>Registration page</Link>
                 <form>
                     <input name="title" onChange={handleUpdate}></input>
                 </form>

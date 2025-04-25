@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "app_user")
 public class User {
@@ -28,6 +30,9 @@ public class User {
     private String password;
 
     private String role;
+
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
+    private List<Project> projects;
 
     public User() {
     }
@@ -72,5 +77,17 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public List<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
     }
 }
