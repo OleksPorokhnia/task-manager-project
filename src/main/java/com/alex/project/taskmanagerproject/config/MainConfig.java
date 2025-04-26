@@ -11,12 +11,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.servlet.http.HttpServletResponse;
+import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.*;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -52,12 +54,9 @@ import java.util.List;
 import java.util.Properties;
 
 @Configuration
-@EnableWebMvc
 @EnableTransactionManagement
-@ComponentScan("com.alex.project.taskmanagerproject")
 @EnableAspectJAutoProxy
 @EnableWebSecurity
-@EnableJpaRepositories("com.alex.project.taskmanagerproject.repository")
 public class MainConfig {
 
     @Autowired
@@ -69,17 +68,6 @@ public class MainConfig {
     @Bean
     public JwtFilter jwtFilter(JwtService jwtService, CustomUserDetailsService customUserDetailsService) {
         return new JwtFilter(jwtService, customUserDetailsService);
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        HikariConfig config = new HikariConfig();
-        config.setDriverClassName("org.postgresql.Driver");
-        config.setJdbcUrl("jdbc:postgresql://localhost:5444/taskManDB");
-        config.setUsername("postgres");
-        config.setPassword("ahsas125");
-        config.setMaximumPoolSize(10);
-        return new HikariDataSource(config);
     }
 
     @Bean
@@ -134,18 +122,6 @@ public class MainConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        vendorAdapter.setGenerateDdl(true);
-
-        LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
-        factory.setJpaVendorAdapter(vendorAdapter);
-        factory.setPackagesToScan("com.alex.project.taskmanagerproject.entity");
-        factory.setDataSource(dataSource());
-        return factory;
     }
 
     @Bean
