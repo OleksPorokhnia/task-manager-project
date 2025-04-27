@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface TaskRepository extends JpaRepository<Task, Integer> {
     public void deleteAllByIdIn(List<Integer> ids);
     public List<Task> getAllByProject(Project project);
+    public void deleteById(int id);
 }

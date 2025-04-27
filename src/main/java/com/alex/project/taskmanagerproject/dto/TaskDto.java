@@ -7,7 +7,9 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-public class TaskDto {
+public class TaskDto implements DtoLayer{
+
+    private int id;
     @NotNull(message = "Title cannot be null")
     @Size(max  = 100, message = "Title cannot be greater than 100 symbols")
     private String title;
@@ -88,6 +90,14 @@ public class TaskDto {
 //    }
 
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public @NotNull(message = "Title cannot be null") @Size(max = 100, message = "Title cannot be greater than 100 symbols") String getTitle() {
         return title;
     }
@@ -160,4 +170,6 @@ public class TaskDto {
     public void setCreatorUsername(@NotNull(message = "Creator cannot be null") String creatorUsername) {
         this.creatorUsername = creatorUsername;
     }
+
+
 }

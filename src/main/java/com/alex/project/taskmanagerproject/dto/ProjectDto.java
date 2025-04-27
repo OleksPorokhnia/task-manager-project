@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
-public class ProjectDto {
+public class ProjectDto implements DtoLayer{
     @Size(min = 10, max = 100)
     private String title;
 

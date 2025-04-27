@@ -42,6 +42,7 @@ Throughout development, I faced and solved many technical challenges, which help
 ### Requirements
 - [Docker](https://www.docker.com/get-started/) installed
 - [Docker compose](https://docs.docker.com/compose/) (included in Docker Desktop)
+- [Java JDK 21](https://www.oracle.com/cis/java/technologies/downloads/)
 
 1. Clone the repository
 
@@ -57,7 +58,9 @@ docker compose up -d
 #2. Check that containers already up
 docker compose ps
 #3. Start backend
-./mvnw spring-boot:run
+./mvnw spring-boot:run -DskipTest 
+#Or in cmd on Windows
+.\mvnw.exe spring-boot:run -DskipTest
 #Open new tab in terminal
 #Go into frontend folder
 cd React/my-app
@@ -114,6 +117,7 @@ spring.jpa.hibernate.ddl-auto=validate
 - Creation of projects 
 - Responsive UI with Bootstrap
 - Backend validation and error handling
+- Ring buffer data structure
 
 ## 🧪 Test running
 ```shell

@@ -5,6 +5,7 @@ import com.alex.project.taskmanagerproject.repository.CsrfCustomizers;
 import com.alex.project.taskmanagerproject.repository.SpaCsrfTokenRequestHandler;
 import com.alex.project.taskmanagerproject.service.CustomUserDetailsService;
 import com.alex.project.taskmanagerproject.service.JwtService;
+import com.alex.project.taskmanagerproject.service.ringBuffer.TaskRingBufferService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

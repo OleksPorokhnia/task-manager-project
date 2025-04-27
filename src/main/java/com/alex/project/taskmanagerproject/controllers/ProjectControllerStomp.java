@@ -25,7 +25,7 @@ public class ProjectControllerStomp {
             @DestinationVariable int projectId,
             @Payload ProjectDto projectDto
     ){
-        Project project = projectService.updateProject(projectDto, projectId);
+        Project project = projectService.update(projectDto, projectId);
         return ProjectMapper.convertProjectToDto(project);
     }
 }

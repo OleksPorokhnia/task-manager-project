@@ -4,7 +4,9 @@ import com.alex.project.taskmanagerproject.dto.TaskDto;
 import com.alex.project.taskmanagerproject.entity.Task;
 import com.alex.project.taskmanagerproject.entity.User;
 import com.alex.project.taskmanagerproject.exception.ValidationException;
+import com.alex.project.taskmanagerproject.mappers.TaskMapper;
 import com.alex.project.taskmanagerproject.service.TaskService;
+import com.alex.project.taskmanagerproject.service.ringBuffer.TaskRingBufferService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,26 +20,36 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class TaskController {
 
     @Autowired
+    private TaskRingBufferService taskRingBufferService;
+
+    @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private TaskMapper taskMapper;
 
     @MessageMapping("/project/{projectId}/tasks")
     @SendTo("/topic/project/{projectId}/tasks")
-    public List<Task> getAllTasks(@DestinationVariable int projectId) {
-        return taskService.getAllTasks(projectId);
+    public List<TaskDto> getAllTasks(@DestinationVariable int projectId) {
+        List<TaskDto> allTasks = new ArrayList<>(taskRingBufferService.getBufferCopy(projectId));
+        allTasks.addAll(taskService.getAll(projectId).stream().map(task -> taskMapper.toTaskDtoFromTask(task)).toList());
+        System.out.println(allTasks);
+        return allTasks;
     }
 
     @MessageMapping("/project/{projectId}/task/add")
     @SendTo("/topic/project/{projectId}/task/add")
-    public Task addTask(
+    public TaskDto addTask(
             @DestinationVariable int projectId,
             @Payload @Valid TaskDto taskDto) {
-        return taskService.createTask(taskDto, projectId);
+        return taskRingBufferService.addToBuffer(taskDto, projectId);
     }
 
     @MessageMapping("/project/{projectId}/task/delete")
@@ -46,7 +58,7 @@ public class TaskController {
             @DestinationVariable int projectId,
             @Payload List<Integer> taskIds){
         try {
-            taskService.deleteAllSelectedTasks(taskIds);
+            taskRingBufferService.removeFromBuffer(taskIds);
         }catch (Exception e){
             e.printStackTrace();
             return null;
@@ -62,10 +74,10 @@ public class TaskController {
 
     @MessageMapping("/project/{projectId}/task/{taskId}/update")
     @SendTo("/topic/project/{projectId}/task/update")
-    public Task updateTask(
+    public TaskDto updateTask(
             @DestinationVariable int projectId,
             @DestinationVariable int taskId,
             @Payload @Valid TaskDto taskDto){
-        return taskService.updateTask(taskDto, projectId, taskId);
+        return taskRingBufferService.updateInBuffer(taskDto, projectId, taskId);
     }
 }
