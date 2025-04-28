@@ -41,4 +41,15 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(errors);
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptionForHttp(RuntimeException ex){
+        Map<String, String> errors = new HashMap<>();
+        if(ex.getMessage().startsWith("Email")){
+            errors.put("email", ex.getMessage());
+        }else if(ex.getMessage().startsWith("Username")){
+            errors.put("nickname", ex.getMessage());
+        }
+        return ResponseEntity.badRequest().body(errors);
+    }
 }

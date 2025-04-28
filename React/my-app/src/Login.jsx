@@ -4,58 +4,30 @@ import axios, { all } from "axios";
 import Cookies from 'js-cookie'
 import { use } from 'react';
 import apiClient from './api';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 
 function Login() {
   const [user, setUser] = useState({});
+  const [errors, setErrors] = useState([]);
 
   const navigate = useNavigate();
-  async function fetchCsrfToken(){
-    try{
-      const resp = await axios.get("/auth/csrf", 
-        {
-          withCridentials: true
-        }
-      )
-      console.log("Log from function: " + resp.data);
-      return resp.data;
-    }catch(error){
-        console.log("Error");
-    }
-  } 
+  
   async function handleLogin (){
-      // await fetchCsrfToken();
-      // const csrf = Cookies.get("XSRF-TOKEN");
-      // if (!csrfToken) {
-      //   console.error("No CSRF token available. Aborting login.");
-      //   return;
-      // }
-      // console.log("Log from handleLoging: " + csrfToken);
-      // const loggingResponse = await axios.post("http://localhost:8080/api/auth/login", 
-      //   user, {
-      //     headers:{
-      //         'Content-Type': 'application/json',
-      //         'X-XSRF-TOKEN': csrfToken
-      //     },
-      //     withCredentials: true
-      // }
-      // )
-
       try{
-        // await apiClient.get("auth/csrf");
         const response = await apiClient.post('auth/login', user);
-        // const me = await apiClient.get("auth/me");
-        // console.log("current user " + me.data.username);
-        //   localStorage.setItem("username", me.data.username);
         console.log("Login successful! Response data:", response);
         localStorage.setItem("token", response.data.token);
+        setErrors([]);
         navigate("/");
       } catch (error) {
         console.error("Error during login:", error.response.data);
+        setErrors(error.response.data);
       }
 
   };
+
+  console.log(errors.message);
 
   async function handleLogout(){
     localStorage.removeItem("token");
@@ -74,13 +46,37 @@ function Login() {
 
   return (
     <>
-        <div>
-            <h2>Login</h2>
-            <input type="email" placeholder="Email" name="email" onChange={handleUpdate} />
-            <input type="password" placeholder="Пароль" name="password" onChange={handleUpdate} />
-            <button onClick={handleLogin}>Login</button>
-            <br/><br/>
-            <button onClick={handleLogout}>Logout</button>
+        <div className='d-flex flex-column align-items-center justify-content-center vh-100'>
+            <div className='mb-5' style={{fontSize: 80, color: "#2E22DC"}}>Log In</div>
+            <div className='has-validation mb-4'>
+              <div className='form-floating'>
+                <input className={`form-control ${(errors.email || errors.message) ? 'is-invalid' : ''}`} style={{width: 300}} required type="email" id="floatingEmail" placeholder="Email" name="email" onChange={handleUpdate} />
+                <label for="floatingUsername">Email</label>
+                {(errors.message || errors.email) && 
+                  <div className='invalid-feedback'>
+                    {errors.message || errors.email}
+                  </div>
+                }
+              </div>
+            </div>
+            <div className='mb-4'>
+              <div className='form-floating'>
+                <input className={`form-control ${(errors.password || errors.message) ? 'is-invalid' : ''}`} style={{width: 300}} id="floatingPassword" type="password" placeholder="Password" name="password" onChange={handleUpdate} />
+                <label for="floatingPassword">Password</label>
+                {(errors.message || errors.password) && 
+                  <div className='invalid-feedback'>
+                    {errors.message || errors.password}
+                  </div>
+                }
+              </div>
+            </div>
+            <div>
+              <div className='d-flex flex-column fs-5 mb-2'>
+                New user? 
+                <Link style={{textDecoration: "none", color: "#645BE5"}} to={`/auth/registration`}>Sign Up</Link>
+              </div>
+              <button className='btn fs-4' style={{backgroundColor: "#645BE5", color: "#FFFFFF", height: 50, width: 300}} onClick={handleLogin}>Log In</button>
+            </div>
         </div>
     </>
   )

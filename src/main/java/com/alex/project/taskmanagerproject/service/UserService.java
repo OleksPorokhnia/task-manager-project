@@ -28,7 +28,7 @@ public class UserService {
             throw new RuntimeException("Email already exists");
         }
         if(userRepository.existsByNickname(userRegistrationRequest.getNickname())) {
-            throw new RuntimeException("Nickname already exists");
+            throw new RuntimeException("Username already exists");
         }
 
         User user = new User();

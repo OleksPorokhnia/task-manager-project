@@ -44,7 +44,6 @@ function BurgerMenu({checkedTasks, project}){
     })
 
     async function deleteTasks(e){
-        e.preventDefault();
         if(clientRef.current && clientRef.current.connected){
             clientRef.current.publish({
                 destination: `/app/project/${id}/task/delete`,

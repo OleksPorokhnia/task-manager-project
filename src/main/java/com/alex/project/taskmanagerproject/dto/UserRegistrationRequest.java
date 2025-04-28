@@ -15,7 +15,7 @@ public class UserRegistrationRequest {
 
     @NotNull(message = "Password cannot be blank")
     @NotBlank(message = "Password cannot be blank")
-    @Size(min = 8)
+    @Size(min = 8, message = "Password must be minimum 8 symbols")
     private String password;
 
     public UserRegistrationRequest(String nickname, String email, String password) {
@@ -40,11 +40,11 @@ public class UserRegistrationRequest {
         this.email = email;
     }
 
-    public @NotNull(message = "Password cannot be blank") @NotBlank(message = "Password cannot be blank") @Size(min = 8) String getPassword() {
+    public @NotNull(message = "Password cannot be blank") @NotBlank(message = "Password cannot be blank") @Size(min = 8,message = "Password must be minimum 8 symbols") String getPassword() {
         return password;
     }
 
-    public void setPassword(@NotNull(message = "Password cannot be blank") @NotBlank(message = "Password cannot be blank") @Size(min = 8) String password) {
+    public void setPassword(@NotNull(message = "Password cannot be blank") @NotBlank(message = "Password cannot be blank") @Size(min = 8, message = "Password must be minimum 8 symbols") String password) {
         this.password = password;
     }
 }
