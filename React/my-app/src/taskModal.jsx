@@ -80,6 +80,11 @@ function TaskModal({project, realTasks}){
         console.log(editedTask);
     }
 
+    if(!task){
+        return (<div>Loading...</div>)
+    }
+
+    console.log(task.creatorUsername);
 
     return(
         <Fragment>
@@ -235,7 +240,7 @@ function TaskModal({project, realTasks}){
                         </div>
                     </div>
                 </div>
-                {(localStorage.getItem("username") == task.creator.nickname) ? <button type="submit" className="btn btn-success">Edit</button> : <div></div>}
+                {(localStorage.getItem("username") == task.creatorUsername) ? <button type="submit" className="btn btn-success">Edit</button> : <div></div>}
             </form>
             )}
         </Fragment>

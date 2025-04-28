@@ -2,6 +2,13 @@ import { Fragment } from "react"
 import { Link } from "react-router"
 
 function Header(){
+
+    function handleLogout(){
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+    }
+
+
     return (
         <Fragment>
             <div className="d-flex justify-content-end mt-4 border-bottom border-2 mb-3 pb-4">

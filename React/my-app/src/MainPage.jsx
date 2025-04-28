@@ -19,11 +19,11 @@ function MainPage(){
     }, [])
     async function handleAddProject(){
         try{
-            const response = await apiClient.post("/project/add", project, {
+            const response = await apiClient.post("/project/add", project,{
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
-            });
+        });
             setProjects(prevProj => [response.data, ...prevProj]);
             setProject({});
         }catch(e){

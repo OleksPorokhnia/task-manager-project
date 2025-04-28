@@ -133,6 +133,7 @@ function ProjectView() {
                 ? prev.filter((id) => id != taskId)
                 : [...prev, taskId]        
     );
+    console.log("All cheked tasks" + checkedTask);
     };
 
     return(
@@ -156,13 +157,13 @@ function ProjectView() {
                                 <tr key={task.id} onClick={(e) => {
                                         if (e.target.tagName === "INPUT") return;
                                         getTask(task.id)}}>
-                                    <th><input className={`${(task.status === "DONE") ? "bg-light text-muted" : ""}`} disabled={(task.status === "DONE" || task.creator.nickname != localStorage.getItem("username"))} type="checkbox" checked={checkedTask.includes(task.id)} onChange={(e) => {
+                                    <th><input className={`${(task.status === "DONE") ? "bg-light text-muted" : ""}`} disabled={(task.status === "DONE" || task.creatorUsername != localStorage.getItem("username"))} type="checkbox" checked={checkedTask.includes(task.id)} onChange={(e) => {
                                         addToList(task.id)}}></input>
                                     </th>
                                     <td className={task.status === "DONE" ? "bg-light text-muted" : ""}>{task.title}</td>
                                     <td className={task.status === "DONE" ? "bg-light text-muted" : ""}>{task.priority > 0 ? task.priority : 0}</td>
                                     <td className={task.status === "DONE" ? "bg-light text-muted" : ""}>{task.status}</td>
-                                    <td className={task.status === "DONE" ? "bg-light text-muted" : ""}>{task.creator != null ? task.creator.nickname : "None"}</td>
+                                    <td className={task.status === "DONE" ? "bg-light text-muted" : ""}>{task.creatorUsername != null ? task.creatorUsername : "None"}</td>
                                 </tr>
                             ))}
                         </tbody>
