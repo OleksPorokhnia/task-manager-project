@@ -36,6 +36,9 @@ public class TaskRingBufferService extends RingBufferService<Task, TaskDto, Task
         if(taskDto.getId() == 0){
             taskDto.setId(-(bufferMap.size() + counter));
         }
+        if(taskDto.getStatus() == null || taskDto.getStatus().isEmpty()){
+            taskDto.setStatus("TODO");
+        }
         taskDto.setProject_id(projId);
 
         if(bufferMap.size() >= BUFFER_SIZE){
@@ -57,7 +60,7 @@ public class TaskRingBufferService extends RingBufferService<Task, TaskDto, Task
 
     @Override
     public void removeFromBuffer(List<Integer> taskIds) {
-        taskIds.stream()
+        taskIds
                 .forEach(id -> {
                     if(id > 0){
                         taskService.delete(id);

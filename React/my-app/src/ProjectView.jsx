@@ -5,12 +5,14 @@ import { useEffect } from "react";
 import Header from "./NavigationComponents/Header";
 import BurgerMenu from "./NavigationComponents/BurgerMenu";
 import {Modal} from 'react-bootstrap'
-import AddTask from "./AddTAsk";
+import AddTask from "./AddTask";
 import { marked } from 'marked'
+import "./styles/taskStyles.css"
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { all } from "axios";
 import TaskModal from "./taskModal";
+import Notifications from "./Notifications/Notifications";
 
 
 
@@ -27,6 +29,7 @@ function ProjectView() {
     const [checkedTask, setCheckedTask] = useState([]);
 
     const location = useLocation();
+
 
     //const isTaskOpen = location.pathname.includes("/task");
 
@@ -139,6 +142,7 @@ function ProjectView() {
     return(
         <Fragment>
             <Header />
+            {/* <Notifications /> */}
             <div className="d-flex">
                 <BurgerMenu project={proj} checkedTasks={checkedTask}/>
                 <div className="ms-5 w-100">
@@ -149,12 +153,13 @@ function ProjectView() {
                                 <th scope="col">Title</th>
                                 <th scope="col">Priority</th>
                                 <th scope="col">Task status</th>
+                                <th scope="col">Deadline</th>
                                 <th scope="col">Creator</th>
                             </tr>
                         </thead>
                         <tbody>
                             {Array.isArray(tasks) && tasks.map(task => (
-                                <tr key={task.id} onClick={(e) => {
+                                <tr className="table-row-hover task" key={task.id} onClick={(e) => {
                                         if (e.target.tagName === "INPUT") return;
                                         getTask(task.id)}}>
                                     <th><input className={`${(task.status === "DONE") ? "bg-light text-muted" : ""}`} disabled={(task.status === "DONE" || task.creatorUsername != localStorage.getItem("username"))} type="checkbox" checked={checkedTask.includes(task.id)} onChange={(e) => {
@@ -163,6 +168,7 @@ function ProjectView() {
                                     <td className={task.status === "DONE" ? "bg-light text-muted" : ""}>{task.title}</td>
                                     <td className={task.status === "DONE" ? "bg-light text-muted" : ""}>{task.priority > 0 ? task.priority : 0}</td>
                                     <td className={task.status === "DONE" ? "bg-light text-muted" : ""}>{task.status}</td>
+                                    <td className={task.status === "DONE" ? "bg-light text-muted" : ""}>{task.deadline}</td>
                                     <td className={task.status === "DONE" ? "bg-light text-muted" : ""}>{task.creatorUsername != null ? task.creatorUsername : "None"}</td>
                                 </tr>
                             ))}

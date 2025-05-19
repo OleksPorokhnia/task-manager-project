@@ -6,6 +6,7 @@ import com.alex.project.taskmanagerproject.dto.response.UserResponseDto;
 import com.alex.project.taskmanagerproject.entity.Project;
 import com.alex.project.taskmanagerproject.mappers.ProjectMapper;
 import com.alex.project.taskmanagerproject.repository.ProjectRepository;
+import com.alex.project.taskmanagerproject.service.ProjectService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +23,14 @@ public class ProjectController {
 
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private ProjectService projectService;
 
     @PostMapping("/add")
     public ResponseEntity<?> projectCreation(@RequestBody @Valid ProjectDto project) {
         Project createdProject = null;
         try{
-            createdProject = projectRepository.save(ProjectMapper.projectMapper(project));
+            createdProject = projectService.create(project);
         }catch (Exception e){
             return ResponseEntity.status(401).body("Error during project creation");
         }
@@ -43,9 +46,9 @@ public class ProjectController {
         return ResponseEntity.status(200).body(ProjectMapper.convertProjectToDto(project.get()));
     }
 
-    @GetMapping("/")
-    public ResponseEntity<?> getAllProjects() {
-        List<Project> projects = projectRepository.findAll();
+    @GetMapping("/user/{username}")
+    public ResponseEntity<?> getAllProjects(@PathVariable String username) {
+        List<Project> projects = projectService.getAllUserProjects(username);
         List<ProjectResponseDto> projectResponseDtos = projects.stream().map(ProjectMapper::convertProjectToDto).toList();
         return ResponseEntity.status(200).body(projectResponseDtos);
     }

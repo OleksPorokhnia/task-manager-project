@@ -3,6 +3,7 @@ import apiClient from "./api";
 import { useParams } from "react-router";
 import SockJS from "sockjs-client";
 import {Client, StompConfig} from "@stomp/stompjs";
+import "./styles/userSearchingStyles.css"
 
 
 function UserSearching({project}){
@@ -77,9 +78,12 @@ function UserSearching({project}){
 
     function handleProjectUpdate(e){
         e.preventDefault();
+        console.log("Project", project.users);
+        const users = project.users.map(user => user.name);
+        console.log("Users usernames", users)
         const finalProj = {
             ...project,
-            users: checkedUsers
+            users: [...users, ...checkedUsers]
         }
         if(clientRef.current && clientRef.current.connected){
             clientRef.current.publish({
@@ -105,39 +109,46 @@ function UserSearching({project}){
     return(
         <Fragment>
             <div>
-                <input type="text" placeholder="Enter nickname" onChange={(e) => setQuery(e.target.value)}></input>
-                <ul>
+                <div className="input-group">
+                    <div className="form-floating">
+                        <input type="text" className=" form-control" id="usernameForm" placeholder="Enter nickname" onChange={(e) => setQuery(e.target.value)}></input>
+                        <label for="usernameForm">Enter username</label>
+                    </div>
+                </div>
+                <div className="mt-2 ms-1" style={{maxHeight: 250}}>
                     {
                         users
                         .filter(user => {
                             return !project.users.some(projectUser => projectUser.name === user.username)
                         })
                         .map((user) => (
-                                <li style={{listStyle: "none"}} key={user.id}>
-                                    <button onClick={() => usersAddition(user.username)}>{user.username != localStorage.getItem("username") ? user.username : user.username + " (you)"}</button>
-                                </li>
+                                <div style={{listStyle: "none"}} key={user.id}>
+                                    <div className="users mb-1" onClick={() => usersAddition(user.username)}>{user.username != localStorage.getItem("username") ? user.username : user.username + " (you)"}</div>
+                                    <div className="border-bottom border-2 wh-100"></div>
+                                </div>
                         ))
                     }
-                </ul>
+                </div>
                     {
-                        <div>
-                            <div>
+                        <div className="mt-3">
+                            <div className="mb-2">
                                 Now added users: 
                             </div>
-                            <ul>
+                            <div>
                                 {
                                     checkedUsers.map((user) => (
-                                        <li style={{listStyle: "none"}}>
-                                            {user}
-                                            <button onClick={() => usersAddition(user)}>Delete</button>
-                                        </li>
+                                        <div className="d-flex justify-content-between align-content-center" style={{listStyle: "none"}}>
+                                            <div className="ms-2 mt-2">{user}</div>
+                                            <button className="btn btn-danger me-3" onClick={() => usersAddition(user)}>Delete</button>
+                                        </div>
                                     ))
                                 }
-                            </ul>
+                            </div>
                         </div>
                     }
-
-                    <button onClick={handleProjectUpdate}>Add all selected users</button>
+                    {checkedUsers.length !== 0 && 
+                        <button className="btn btn-success mt-4 w-100" onClick={handleProjectUpdate}>Add all selected users</button>
+                    }
             </div>
         </Fragment>
     )

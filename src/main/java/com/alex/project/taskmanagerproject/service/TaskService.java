@@ -104,7 +104,11 @@ public class TaskService implements ServiceLayer<Task, TaskDto> {
 
     @Override
     public void delete(int id) {
-        taskRepository.deleteById(id);
+        try {
+            taskRepository.deleteById(id);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     public void saveAllTasks(List<TaskDto> taskDtos){

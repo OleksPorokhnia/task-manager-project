@@ -44,11 +44,16 @@ function BurgerMenu({checkedTasks, project}){
     })
 
     async function deleteTasks(e){
-        if(clientRef.current && clientRef.current.connected){
-            clientRef.current.publish({
-                destination: `/app/project/${id}/task/delete`,
-                body: JSON.stringify(checkedTasks),
-            });
+
+        const answer = confirm("Do you want to delete all this tasks?")
+
+        if(answer){
+            if(clientRef.current && clientRef.current.connected){
+                clientRef.current.publish({
+                    destination: `/app/project/${id}/task/delete`,
+                    body: JSON.stringify(checkedTasks),
+                });
+            }
         }
     }
 
@@ -79,19 +84,19 @@ function BurgerMenu({checkedTasks, project}){
                 <div className="d-flex flex-column">
                     <div className="border-bottom border-2 mb-2 pb-4 w-100">
                         <div className="align-content-center">
-                            TASK MANAGER
+                            {project.title.toUpperCase()}
                         </div>
                     </div>
                     <button onClick={showModal} className="btn btn-outline-secondary burger-button mb-2 w-100 d-flex mb-4 mt-4"><i className="bi bi-plus-circle me-3"/> Add a new task</button>
                     <button onClick={deleteTasks} className="btn btn-outline-secondary burger-button mb-2 w-100 d-flex mb-4"><i className="bi bi-dash-circle me-3"/>Remove task</button>
-                    <button className="btn btn-outline-secondary burger-button mb-2 w-100 d-flex mb-4"><i className="bi bi-box-seam me-3"/>Create new task group</button>
+                    <button className="btn btn-outline-secondary burger-button mb-2 w-100 d-flex mb-4" disabled><i className="bi bi-box-seam me-3"/>Create new task group</button>
                     <button onClick={showUserSearch} className="btn btn-outline-secondary burger-button mb-2 w-100 d-flex text-center mb-4"><i className="bi bi-people me-3"/>Add a new project contributor</button>
                 </div>
                 ) : (
                 <div className="d-flex flex-column">
                     <button onClick={showModal} className="btn burger-button btn-outline-secondary mb-4"><i className="bi bi-plus-circle"></i></button>
                     <button onClick={deleteTasks} className="btn btn-outline-secondary burger-button mb-4"><i className="bi bi-dash-circle"></i></button>
-                    <button className="btn btn-outline-secondary burger-button mb-4"><i className="bi bi-box-seam"></i></button>
+                    <button className="btn btn-outline-secondary burger-button mb-4" disabled><i className="bi bi-box-seam"></i></button>
                     <button onClick={showUserSearch} className="btn btn-outline-secondary burger-button mb-4"><i className="bi bi-people"></i></button>
                 </div>
                 )}

@@ -18,6 +18,7 @@ function Login() {
         const response = await apiClient.post('auth/login', user);
         console.log("Login successful! Response data:", response);
         localStorage.setItem("token", response.data.token);
+        localStorage.setItem("username", response.data.username)
         setErrors([]);
         navigate("/");
       } catch (error) {
@@ -28,11 +29,6 @@ function Login() {
   };
 
   console.log(errors.message);
-
-  async function handleLogout(){
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-  }
 
 
   const handleUpdate = (e) => {
