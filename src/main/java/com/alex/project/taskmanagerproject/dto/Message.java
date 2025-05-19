@@ -3,13 +3,13 @@ package com.alex.project.taskmanagerproject.dto;
 public class Message {
     private String theme;
     private String message;
-    private int projectId;
+    private String projectId;
     private String userEmail;
 
     public Message() {
     }
 
-    public Message(String theme, String message, int projectId, String userEmail) {
+    public Message(String theme, String message, String projectId, String userEmail) {
         this.theme = theme;
         this.message = message;
         this.projectId = projectId;
@@ -32,11 +32,11 @@ public class Message {
         this.message = message;
     }
 
-    public int getProjectId() {
+    public String getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(int projectId) {
+    public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
 

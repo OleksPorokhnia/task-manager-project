@@ -1,0 +1,6 @@
+tr.task:hover td,
+tr.task:hover th {
+    color: white;
+    background-color: #97bcf7;
+    cursor: pointer;
+}
