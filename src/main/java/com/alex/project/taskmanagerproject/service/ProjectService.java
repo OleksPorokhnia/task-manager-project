@@ -45,6 +45,10 @@ public class ProjectService implements ProjectServiceLayer {
         return user.getProjects();
     }
 
+    public Project getProjectById(int projectId) {
+        return projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+    }
+
     @Override
     public Project create(ProjectDto dto) {
         User user = userRepository.findByNickname(dto.getUsers().get(0)).orElseThrow(() -> new RuntimeException("User not found"));

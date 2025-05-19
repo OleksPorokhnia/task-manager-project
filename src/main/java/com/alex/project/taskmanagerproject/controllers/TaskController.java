@@ -6,6 +6,7 @@ import com.alex.project.taskmanagerproject.entity.Task;
 import com.alex.project.taskmanagerproject.entity.User;
 import com.alex.project.taskmanagerproject.exception.ValidationException;
 import com.alex.project.taskmanagerproject.mappers.TaskMapper;
+import com.alex.project.taskmanagerproject.service.ProjectService;
 import com.alex.project.taskmanagerproject.service.TaskService;
 import com.alex.project.taskmanagerproject.service.UserService;
 import com.alex.project.taskmanagerproject.service.notification_service.NotificationProducer;
@@ -46,6 +47,8 @@ public class TaskController {
 
     @Autowired
     private NotificationProducer notificationProducer;
+    @Autowired
+    private ProjectService projectService;
 
     @MessageMapping("/project/{projectId}/tasks")
     @SendTo("/topic/project/{projectId}/tasks")
@@ -85,7 +88,7 @@ public class TaskController {
 
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        notificationProducer.sendNotification(new Message("Task creation", "Successfully created task" + taskDto.getTitle(), projectId, customUserDetails.getEmail()));
+        notificationProducer.sendNotification(new Message("Task creation", "Successfully created task with title: " + taskDto.getTitle(), projectService.getProjectById(projectId).getTitle(), customUserDetails.getEmail()));
 
         return taskRingBufferService.addToBuffer(taskDto, projectId);
     }
@@ -115,7 +118,14 @@ public class TaskController {
     public TaskDto updateTask(
             @DestinationVariable int projectId,
             @DestinationVariable int taskId,
-            @Payload @Valid TaskDto taskDto){
+            @Payload @Valid TaskDto taskDto,
+            Principal principal) {
+
+        Authentication authentication = (Authentication) principal;
+
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        notificationProducer.sendNotification(new Message("Task creation", "Task " + taskDto.getTitle() + " was updated", projectService.getProjectById(projectId).getTitle(), customUserDetails.getEmail()));
         return taskRingBufferService.updateInBuffer(taskDto, projectId, taskId);
     }
 }
