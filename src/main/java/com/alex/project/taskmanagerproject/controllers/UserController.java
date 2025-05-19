@@ -83,7 +83,7 @@ public class UserController {
         }
 
         String jwt = jwtService.generateToken(userDetails);
-        return ResponseEntity.ok(new AuthResponse(jwt));
+        return ResponseEntity.ok(new AuthResponse(jwt, userDetails.getUsername()));
     }
 
     @GetMapping("/me")
@@ -102,7 +102,7 @@ public class UserController {
             }
 
             String jwt = jwtService.generateToken(userDetails);
-            return ResponseEntity.ok(new AuthResponse(jwt));
+            return ResponseEntity.ok(new AuthResponse(jwt, userDetails.getUsername()));
         }catch (Exception e){
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", e.getMessage()));
         }

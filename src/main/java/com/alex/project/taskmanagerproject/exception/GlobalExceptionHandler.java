@@ -20,10 +20,19 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     @MessageExceptionHandler(MethodArgumentNotValidException.class)
     @SendToUser("/queue/errors")
-    public List<String> handleValidationException(MethodArgumentNotValidException ex){
+    public List<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex){
         assert ex.getBindingResult() != null;
         return ex.getBindingResult().getAllErrors().stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .map(error -> {
+                    Map<String, String> errorMap = new HashMap<>();
+                    if(error instanceof FieldError fieldError){
+                        errorMap.put("field", fieldError.getField());
+                    }else{
+                        errorMap.put("error", "global");
+                    }
+                    errorMap.put("message", error.getDefaultMessage());
+                    return errorMap;
+                })
                 .collect(Collectors.toList());
     }
 

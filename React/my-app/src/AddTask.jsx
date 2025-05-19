@@ -10,9 +10,11 @@ function AddTask({project}){
     const {id} = useParams();
     const [error, setError] = useState([]);
 
-    const [status, setStatus] = useState();
+    const [success, setSuccess] = useState("");
 
     const clientRef = useRef(null);
+
+    const naviaget = useNavigate();
 
     function connectWebSocket(){
         const client = new Client({
@@ -28,8 +30,24 @@ function AddTask({project}){
 
         client.onConnect = () => {
             client.subscribe("/user/queue/errors", (errors) => {
-                setError(errors.body);
+                const parsedErrors = JSON.parse(errors.body);
+                if (Array.isArray(parsedErrors)) {
+                    setError(parsedErrors); 
+                } else {
+                    setError([parsedErrors]);
+                }
             })
+
+            client.subscribe("/user/queue/success", (message) => {
+                const success = JSON.parse(message.body);
+                setSuccess(success);
+
+            })
+
+            client.publish({
+                destination: "/app/client-ready",
+                body: JSON.stringify({ status: "ready" }),
+            });
         };
 
         client.activate();
@@ -44,12 +62,12 @@ function AddTask({project}){
         return () => {
             clientRef.current?.deactivate();
         }
-    }, [])
+    }, [error])
 
     async function addNewTask(e){
         e.preventDefault();
-        console.log("Errors: " + error)
-
+        setError([]);
+        setSuccess("");
         const finalTask = {
             ...task,
             creatorUsername: localStorage.getItem("username")
@@ -60,6 +78,8 @@ function AddTask({project}){
                 body: JSON.stringify(finalTask),
             })
         }
+        console.log("Errors", error);
+        console.log(success.message);
     }
 
     const close = () => {
@@ -77,16 +97,37 @@ function AddTask({project}){
 
     return (
         <Fragment>
-            
+            {
+                success && 
+                <div className="alert alert-success">
+                    {success.message}
+                </div>
+            }
             <form className="d-flex flex-column w-100" onSubmit={addNewTask}>
-                <div className="input-group mb-3 border-1 rounded">
+                <div className="input-group mb-3 has-validation border-1 rounded">
                     <div className="fw-bold mb-1">
                         Title
                     </div>
-                    <div className="flex-nowrap input-group mb-3 border-1 rounded">
-                        <i className="bi bi-pencil-square input-group-text"></i>
-                        <input className="w-100 form-control" type="text" name="title" placeholder="Enter the title here..." onChange={handleChange}></input>
-                    </div>
+                    <div className="input-group mb-3 border-1">
+                        <i className={`bi bi-pencil-square input-group-text`}></i>
+                        <div className={`form-floating ${error.filter(err => (
+                                        err.field === 'title')) ? 'is-invalid' : '' }`}>
+                            <input className={`w-100 form-control ${error.some(err => (
+                                        err.field === 'title')) ? 'is-invalid' : '' }`} type="text" name="title" id="floatingTitle" placeholder="Enter the title here..." onChange={handleChange}></input>
+                            <label for="floatingTitle">Enter title</label>
+                        </div>
+                        {
+                                (error.length > 0 && 
+                                    error.filter(err => (
+                                        err.field === 'title'))
+                                        .map((err, index) => (
+                                            <div key={index} className="invalid-feedback" style={{marginLeft: 40}}>
+                                                {err.message}
+                                            </div>
+                                        ))
+                                )
+                            }
+                    </div> 
                 </div>
                 <div className="input-group mb-3">
                     <div className="fw-bold mb-1">
@@ -96,14 +137,45 @@ function AddTask({project}){
                         <div className="input-group-prepend">
                             <span className="input-group-text"><i class="bi bi-pencil"></i></span>
                         </div>
-                            <textarea className="form-control" name="description" placeholder="Enter description here..." onChange={handleChange} style={{height: 200,resize: "none"}}></textarea>
+                        <div className="form-floating">
+                            <textarea className={`w-100 form-control ${error.some(err => (
+                                        err.field === 'description')) ? 'is-invalid' : '' }`} id="floatingDescription" name="description" placeholder="Enter description here..." onChange={handleChange} style={{height: 200,resize: "none"}}></textarea>
+                            <label for="floatingDescription">Enter description</label>
+                            {
+                                (error.length > 0 && 
+                                    error.filter(err => (
+                                        err.field === 'description'))
+                                        .map((err, index) => (
+                                            <div key={index} className="invalid-feedback">
+                                                {err.message}
+                                            </div>
+                                        ))
+                                )
+                            }
+                        </div>
                     </div>
                 </div>
                 <div className="input-group mb-3 d-flex flex-column">
                     <div className="mb-1 fw-bold">
                         Deadline
                     </div>
-                    <input className="border-1 rounded w-100 ps-3" type ="date" name="deadline" style={{height: 40}} onChange={handleChange}></input>
+                    <div className="input-group">
+                        <div className="form-floating">
+                            <input className={`w-100 form-control rounded ps-3 pb-4 ${error.some(err => (
+                                        err.field === 'deadline')) ? 'is-invalid' : '' }`} type ="date" id="floatingDeadline" name="deadline" style={{height: 40}} onChange={handleChange}></input>
+                            {
+                                (error.length > 0 && 
+                                    error.filter(err => (
+                                        err.field === 'deadline'))
+                                        .map((err, index) => (
+                                            <div key={index} className="invalid-feedback">
+                                                {err.message}
+                                            </div>
+                                        ))
+                                )
+                            }
+                        </div>
+                    </div>
                 </div>
                 <div className="d-flex justify-content-between mb-4">
                     <div className="d-flex flex-column">
@@ -132,7 +204,7 @@ function AddTask({project}){
                             </button>
                             }
                             <ul className="dropdown-menu">
-                                <li className="ms-3"><button className="dropdown-item" type="button" name="status" value="TODO" onClick={handleChange}>TO DO</button></li>
+                                <li className="ms-3"><button className="dropdown-item" type="button" name="status" value="TODO" onClick={handleChange}>TODO</button></li>
                                 <li className="ms-3"><button className="dropdown-item" type="button" name="status" value="IN PROGRESS" onClick={handleChange}>IN PROGRESS</button></li>
                                 <li className="ms-3"><button className="dropdown-item" type="button" name="status" value="DONE" onClick={handleChange}>DONE</button></li>
                             </ul>
@@ -153,7 +225,7 @@ function AddTask({project}){
                         </div>
                         <div className="dropdown">
                             <button className="btn btn-success dropdown-toggle mb-1" data-bs-toggle="dropdown" aria-expanded="false" type="button">
-                                {task.userUsername}
+                                {task.userUsername == null && "Add new"}
                             </button>
                             <ul className="dropdown-menu">
                                 {

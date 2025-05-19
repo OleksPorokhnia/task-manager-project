@@ -24,6 +24,7 @@ public class ProjectService implements ProjectServiceLayer {
         this.userRepository = userRepository;
     }
 
+    @Override
     public Project update(ProjectDto projectDto, int projectId) {
 
         Project project = projectRepository.findById(projectId)
@@ -36,6 +37,23 @@ public class ProjectService implements ProjectServiceLayer {
         project.setUsers(users);
 
         return projectRepository.save(project);
+    }
+
+    public List<Project> getAllUserProjects(String username) {
+        User user = userRepository.findByNickname(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getProjects();
+    }
+
+    @Override
+    public Project create(ProjectDto dto) {
+        User user = userRepository.findByNickname(dto.getUsers().get(0)).orElseThrow(() -> new RuntimeException("User not found"));
+
+        Project project = new Project();
+        project.setTitle(dto.getTitle());
+        project.setUsers(List.of(user));
+        projectRepository.save(project);
+        return null;
     }
 
     @Override

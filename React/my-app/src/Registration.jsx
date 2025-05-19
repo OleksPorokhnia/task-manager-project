@@ -17,6 +17,7 @@ function Registration() {
       const response = await apiClient.post("/auth/register", user);
       localStorage.removeItem("token");
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("username", response.data.username)
       navigate("/");
     }catch(error){
         console.log("Errors during registration ", error.response.data)
