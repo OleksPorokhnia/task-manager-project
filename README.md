@@ -68,6 +68,17 @@ cd React/my-app
 npm install
 #Start frontend
 npm run dev
+#Launch notification service
+git clone https://github.com/OleksPorokhnia/notification-service-task-manager
+cd notification-service-task-manager
+#1. Up Postgres and Elastic Search and wait installation
+docker compose up -d
+#2. Check that containers already up
+docker compose ps
+#3. Start backend
+./mvnw spring-boot:run -DskipTest 
+#Or in cmd on Windows
+.\mvnw.exe spring-boot:run -DskipTest
 ```
 The frontend will be available at http://localhost:5173
 
